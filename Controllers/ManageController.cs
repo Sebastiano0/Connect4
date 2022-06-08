@@ -47,8 +47,14 @@ namespace Connect4.Controllers
         // GET: /Manage/Index
         public ActionResult Index()
         {
-
-            return View(db.Matches.ToList());
+            if(User.Identity.GetUserName() != null)
+            {
+                return View(db.Matches.ToList());
+            } else
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            
         }
 
         public ActionResult Create()
@@ -110,10 +116,7 @@ namespace Connect4.Controllers
         }
 
         public ActionResult Game(Match match)
-        {   //creo la tabella con dati salvati
-            match = match.GetMatch(match, db);
-            ViewBag.table = match.DrawTable(match);
-            
+        {   
             string user = User.Identity.GetUserName();
             bool player1Logged = user == match.UsernamePlayer1;
             bool player2Logged = user == match.UsernamePlayer2;
@@ -121,7 +124,8 @@ namespace Connect4.Controllers
             {
                 return HttpNotFound();
             }
-             View();
+            match = match.GetMatch(match, db);
+            ViewBag.table = match.DrawTable(match);
             //controllo se il giocatore loggato ha perso
             if ((player2Logged && match.Winner == match.UsernamePlayer1) || (player1Logged && match.Winner == match.UsernamePlayer2))
             {
@@ -165,9 +169,8 @@ namespace Connect4.Controllers
                     TempData["AlertMessage"] = "Wait your turn please";
                     break;
             }
-            if (match.VersusComputer)
+            if (match.VersusComputer && (valueOfMove != 1 || valueOfMove != 2))
             {
-                
                 valueOfMove = ComputerMove(match);
                 while (valueOfMove == 0)
                 {//faccio la mossa finchè non vado su una colonna vuota
@@ -180,16 +183,27 @@ namespace Connect4.Controllers
         }
 
         public int ComputerMove(Match match)
-        {
-            int[,] field = new int[6,7];//righe,colonne
-            
+        {            
             return match.MakeMove(match, rnd.Next(0, 7), db);            
         }
 
-        public ActionResult GetUpdateMatches()
+        public ActionResult GetUpdateData()
         {
-            return PartialView("_Partial_Index", db.Matches.ToList());
+            return PartialView("_IndexPartial", db.Matches.ToList());
             //return PartialView("Index", db.Matches.ToList());
+        }
+
+        public ActionResult GetUpdateTable(Match match)
+        {
+            //TempData["AlertMessage"] = Request.Url.AbsoluteUri;
+            /*string url = Request.Url.ToString().Split('?')[1].Split('&')[1];
+
+            match = (Match)db.Matches.Where(c => c.Name.Equals(url));
+            //creo la tabella con dati salvati
+            match = match.GetMatch(match, db); */
+            ViewBag.table = match.DrawTable(match);
+            return PartialView("_GamePartial", db.Matches.ToList());
+            //return PartialView("_GamePartial");
         }
     }
 }

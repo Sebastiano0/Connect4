@@ -259,6 +259,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Hubs\ShowMatchHub.cs" />
+    <Compile Include="Hubs\ShowTableHub.cs" />
     <Compile Include="Migrations\202206061450537_VersusComputer.cs" />
     <Compile Include="Migrations\202206061450537_VersusComputer.designer.cs">
       <DependentUpon>202206061450537_VersusComputer.cs</DependentUpon>
@@ -314,7 +315,8 @@
     <Content Include="Views\Manage\Create.cshtml" />
     <Content Include="Views\Manage\Game.cshtml" />
     <Content Include="web.config" />
-    <Content Include="Views\Manage\_Partial_Index.cshtml" />
+    <Content Include="Views\Manage\_IndexPartial.cshtml" />
+    <Content Include="Views\Manage\_GamePartial.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

@@ -12,12 +12,13 @@ namespace Connect4
     [HubName("ShowMatchHub")]
     public class ShowMatchHub : Hub
     {
+        [HubMethodName("BroadcastMatch")]
         public static void BroadcastMatch()
         {
             var context = GlobalHost.ConnectionManager.GetHubContext<ShowMatchHub>();
             if (context.Clients != null)
-            {//non è mai null
-                context.Clients.All.GetUpdateMatches();
+            {
+                context.Clients.All.GetUpdateData();
             }
         }
     }

@@ -38,30 +38,39 @@ button{
     background-color:#008CBA;
 }
 </style>
-<script type="text/javascript">
-    
-    int id;
-    
-    void clicked(id)
-    {
-        this.id = id;
-    }
-
-    int getId(){
-        return id;
-    } 
-
-</script>
-
 <!-- Team 1->ROSSI:"#f44336" Team 2->BLU"#008CBA"-->
 <h2>Game</h2>
-@using (Html.BeginForm()) 
-{
-    <div>
-        @Html.Raw(ViewBag.table)
-    </div>
-}
+<div id="tableModel"></div>
 
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
+@section scripts{
+    <script src="~/Scripts/jquery.signalR-2.4.3.min.js"></script>
+    <script src="/signalr/hubs"></script>
+    <script type="text/javascript">
+
+        $(function () {
+            var table = $.connection.ShowTableHub; 
+            
+            table.client.GetUpdateTable = function () { 
+                getAll();
+                console.log("Calll");
+            };
+
+            $.connection.hub.start().done(function () {
+                getAll();
+                table.server.UpdateTable();
+            });
+        });
+
+        function getAll() {
+            var model = $('#tableModel');
+            $.ajax({
+                
+                url: '/Manage/GetUpdateTable',  
+                contentType: 'application/html ; charset:utf-8',
+                type: 'GET',
+                dataType: 'html',
+                success: function(result){ model.empty().append(result);console.log(result);}  
+            });                       
+        }
+    </script>
 }

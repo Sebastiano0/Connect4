@@ -14,7 +14,7 @@ namespace Connect4.Models
 {
     public class Match
     {
-
+        private Random rnd = new Random();
         public List<Column> Columns { get; set; }
         [Key]
         [Required]
@@ -326,6 +326,28 @@ namespace Connect4.Models
                 table += "<p class=" + match.Moves[i].Player + ">" + match.Moves[i].Player +", at column " + (1+match.Moves[i].Column) + " at " + match.Moves[i].TimeStamp + "</p>";
             }
             return table;
+        }
+    
+        public int GetComputerMove(Match match, ManageViewModels db)
+        {
+            int[] values = new int[7];
+            for (int i = 0; i < 6; i++)
+            {//controllo sequenza orizzontale
+                values[i] = CheckVictory(match, 0, 4, 0, i, -1, db);
+            }
+            for (int i = 0; i < 6; i++)
+            {//controllo sequenza orizzontale
+                values[i] = CheckVictory(match, 0, 4, 0, i, -1, db);
+            }
+            for (int i = 0; i < 6; i++)
+            {//controllo sequenza orizzontale
+                values[i] = CheckVictory(match, 0, 4, 0, i, -1, db);
+            }
+            for (int i = 0; i < 6; i++)
+            {//controllo sequenza orizzontale
+                values[i] = CheckVictory(match, 0, 4, 0, i, -1, db);
+            }
+            return rnd.Next(0, 7);
         }
     }
 }
