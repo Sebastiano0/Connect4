@@ -1,0 +1,63 @@
+﻿@model IEnumerable<Connect4.Models.Match>  
+
+<table  class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.NextTurnPlayer)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.State)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Winner)
+        </th>
+        <th></th>
+    </tr>
+    @foreach (var match in Model) {
+        if(match.CanPartecipate(match) ||  match.IsPartecipating(match) || match.CanPlay(match)){
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => match.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => match.Data)
+                </td>
+                <td>
+                    @if(!match.IsFinished(match)){
+                        if(match.CurrentPlayer(match)){
+                            @Html.DisplayFor(modelItem => match.NextTurnPlayer)
+                            <text>(you)</text>
+                        } else {
+                            @Html.DisplayFor(modelItem => match.NextTurnPlayer)
+                        }
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => match.State)
+                </td>
+                <td>
+                    @if(match.IsFinished(match)){
+                        @Html.DisplayFor(modelItem => match.Winner)
+                    }
+                </td>
+                <!--se non c'è neancora il secondo giocatore e il giocatore non è quello che ha creato la partita mostro partecipa-->
+                @if(match.CanPartecipate(match)){
+                    <td>
+                        @Html.ActionLink("Partecipate", "Partecipate", "Manage", match, null)
+                    </td>
+                }<!--se non ci sono entrambi giocatori e il giocatore loggato fa parte del match mostro gioca-->
+                @if(match.CanPlay(match)){
+                    <td>
+                        @Html.ActionLink("Play!", "Game", "Manage", match, null)
+                    </td>
+                }
+            </tr>
+        }
+    }
+</table>

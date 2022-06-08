@@ -1,0 +1,67 @@
+﻿@model IEnumerable<Connect4.Models.Match>
+
+<!--<meta http-equiv="refresh" content="2">-->
+
+@{
+    ViewBag.Title = "Game";
+}
+<style>
+table{
+    width:100%;
+    height:600px;
+}
+
+tr, td{
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+td{
+    width:14.3%;
+    height: 100px
+}
+
+button{
+    width: 80%;
+    height: 60%;
+}
+
+.button{
+    border: none;
+}
+
+.Player1{
+    background-color:#f44336;
+}
+
+.Player2{
+    background-color:#008CBA;
+}
+</style>
+<script type="text/javascript">
+    
+    int id;
+    
+    void clicked(id)
+    {
+        this.id = id;
+    }
+
+    int getId(){
+        return id;
+    } 
+
+</script>
+
+<!-- Team 1->ROSSI:"#f44336" Team 2->BLU"#008CBA"-->
+<h2>Game</h2>
+@using (Html.BeginForm()) 
+{
+    <div>
+        @Html.Raw(ViewBag.table)
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,44 @@
+﻿@model IEnumerable<Connect4.Models.Match>
+@{
+    ViewBag.Title = "Dashboard";
+}
+<!--<meta http-equiv="refresh" content="2">-->
+<h2>@ViewBag.Title</h2>
+@Html.ActionLink("Create match", "Create")
+
+<div id="dataModel"></div>
+@section scripts{
+    <script src="~/Scripts/jquery.signalR-2.4.3.min.js"></script>
+    <script src="/signalr/hubs"></script>
+    <script type="text/javascript">
+
+
+
+        $(function () {
+            var hubNotify = $.connection.ShowMatchHub; 
+        
+            hubNotify.client.GetUpdateData = function () { 
+                console.log("inside");            
+                getAll();
+            };
+
+            $.connection.hub.start().done(function () {
+                getAll();
+            });
+        });
+
+        function getAll() {
+            var model = $('#dataModel');
+            $.ajax({
+                url: '/Manage/GetUpdateMatches',  
+                contentType: 'application/html ; charset:utf-8',
+                type: 'GET',
+                dataType: 'html',
+                success: function(result) 
+                    { 
+                        model.empty().append(result); 
+                    console.log(result);}  
+            });                       
+        }
+    </script>
+}
