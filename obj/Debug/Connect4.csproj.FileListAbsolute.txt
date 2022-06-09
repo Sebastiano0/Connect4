@@ -162,3 +162,4 @@ C:\Users\sbortoletti\Desktop\Progetti\Connect4\bin\System.Text.Encodings.Web.xml
 C:\Users\sbortoletti\Desktop\Progetti\Connect4\bin\System.Text.Json.xml
 C:\Users\sbortoletti\Desktop\Progetti\Connect4\bin\System.Threading.Channels.xml
 C:\Users\sbortoletti\Desktop\Progetti\Connect4\bin\System.Threading.Tasks.Extensions.xml
+C:\Users\sbortoletti\Desktop\Progetti\Connect4\obj\Debug\Connect4.Migrations.change_NextTurnPlayer_Enum_To_Italian.resources

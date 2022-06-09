@@ -1,10 +1,26 @@
 ﻿@model IEnumerable<Connect4.Models.Match>
 @{
-    ViewBag.Title = "Dashboard";
+    ViewBag.Title = "Elenco partite";
 }
-<!--<meta http-equiv="refresh" content="2">-->
+
+<style>
+.play{
+    background-color: #00cc44;
+    color: black;
+}
+
+.partecipate{
+    background-color: #f5ce42;
+    color: black;
+}
+
+.margin{
+    margin: 25px 0;
+}
+</style>
+
 <h2>@ViewBag.Title</h2>
-@Html.ActionLink("Create match", "Create")
+@Html.ActionLink("Crea una partita", "Create", "Manage", new { @class = "btn btn-default margin" })
 
 <div id="dataModel"></div>
 @section scripts{

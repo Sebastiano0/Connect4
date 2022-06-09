@@ -9,10 +9,10 @@ namespace Connect4.Models
 {
         public enum NextTurnPlayer
         {
-            [Display(Name = "Payer 1")]
-            Player1,
-            [Display(Name = "Player 2")]
-            Player2
+            [Display(Name = "Giocatore 1")]
+            Giocatore1,
+            [Display(Name = "Giocatore 2")]
+            Giocatore2
         }
     
 }

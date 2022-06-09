@@ -91,13 +91,13 @@ namespace Connect4.Controllers
 
                 match.UsernamePlayer2 = "Computer";
                 match.State = State.InCorso;
-                match.NextTurnPlayer = NextTurnPlayer.Player1;
+                match.NextTurnPlayer = NextTurnPlayer.Giocatore1;
             }
 
             //controllo che sia stato inserito il nome e che non esista già
             if (!ModelState.IsValid || db.Matches.Find(match.Name) != null || string.IsNullOrWhiteSpace(match.Name))
             {
-                ModelState.AddModelError(string.Empty, "This name is already associated to another game");
+                ModelState.AddModelError(string.Empty, "Questo nome è già associato a un'altra partita");
                 return View(match);
             }
 
@@ -130,7 +130,7 @@ namespace Connect4.Controllers
             db.SaveChanges();
             ShowMatchHub.BroadcastMatch();
             //System.Windows.Forms.MessageBox.Show("Successful enrolled to match");
-            TempData["AlertMessage"] = "Successful enrolled to the match";
+            TempData["AlertMessage"] = "Partecipazione alla partita effettuata";
             return RedirectToAction("Index");
         }
 
@@ -148,13 +148,7 @@ namespace Connect4.Controllers
             //controllo se il giocatore loggato ha perso
             if ((player2Logged && match.Winner == match.UsernamePlayer1) || (player1Logged && match.Winner == match.UsernamePlayer2))
             {
-                
-                Thread.Sleep(1000);
-                
-                TempData["AlertMessage"] = "You have lose";
-                
-                //System.Windows.Forms.MessageBox.Show("You have lose");
-                return RedirectToAction("Index");
+                TempData["AlertMessage"] = "Hai perso";                
             } 
             /*else if((player2Logged && match.Winner == match.UsernamePlayer2) || (player1Logged && match.Winner == match.UsernamePlayer1) || (match.Winner == "Drawn"))
             {
@@ -173,20 +167,20 @@ namespace Connect4.Controllers
             switch (valueOfMove)
             {//controllo le conseguenza della mossa
                 case 0:
-                    TempData["AlertMessage"] = "This column is empty";
+                    TempData["AlertMessage"] = "La colonna è piena";
                     break;
                 case 1:
-                    TempData["AlertMessage"] = "No one has won, it's a draw!";
+                    TempData["AlertMessage"] = "Nessuno ha vinto, è un pareggio!";
                     break;
                 case 2:
-                    TempData["AlertMessage"] = "You won the game!";
+                    TempData["AlertMessage"] = "Hai vinto la partita!";
                     break;
                 case 3:
                     break;
                 case -1:
-                    TempData["AlertMessage"] = "Wait your turn please";
+                    TempData["AlertMessage"] = "Aspetta il tuo turno!";
                     break;
-                default: throw new Exception("Mi sono dimenticato di un valore Cavolo!!!!!");
+                default: throw new Exception("Some exception");
             }
             if (match.VersusComputer && (valueOfMove != 1 || valueOfMove != 2))
             {

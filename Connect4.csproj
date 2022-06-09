@@ -263,6 +263,10 @@
     <Compile Include="Migrations\202206061450537_VersusComputer.designer.cs">
       <DependentUpon>202206061450537_VersusComputer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202206091431381_change_NextTurnPlayer_Enum_To_Italian.cs" />
+    <Compile Include="Migrations\202206091431381_change_NextTurnPlayer_Enum_To_Italian.designer.cs">
+      <DependentUpon>202206091431381_change_NextTurnPlayer_Enum_To_Italian.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Table\Cell.cs" />
@@ -342,6 +346,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202206061450537_VersusComputer.resx">
       <DependentUpon>202206061450537_VersusComputer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206091431381_change_NextTurnPlayer_Enum_To_Italian.resx">
+      <DependentUpon>202206091431381_change_NextTurnPlayer_Enum_To_Italian.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
