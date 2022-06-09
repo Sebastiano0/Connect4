@@ -14,20 +14,31 @@ namespace Connect4.Models
 {
     public class Match
     {
-        private Random rnd = new Random();
         public List<Column> Columns { get; set; }
+
         [Key]
         [Required]
         public string Name { get; set; }//nome partita
+                
         public string Data { get; set; }
         [Display(Name = "Next turn player")]
+        
         public NextTurnPlayer NextTurnPlayer { get; set; }
+        
+        /// <summary>
+        /// Stato attuale della partita
+        /// </summary>
         public State State { get; set; }//In partenza, In corso, Conclusa
+        
         public string UsernamePlayer1 { get; set; }//lo inserisco per ogni utente quando crea o entra nella partita
+        
         public string UsernamePlayer2 { get; set; }
+        
         public string Winner { get; set; }//null nessuno, sennò nome giocatore
+        
         [Display (Name ="Play versus computer")]
         public bool VersusComputer  { get; set; }
+        
         public List<Move> Moves { get; set; }
 
         public int CanWin { get; set; }//se uguale a 7 qualcuno può vincere
@@ -60,8 +71,10 @@ namespace Connect4.Models
 
         }
 
-        public NextTurnPlayer SetNextTurnPlayer()
-        {//prenod un numero random di una serie di numeri random
+        //public NextTurnPlayer SetNextTurnPlayer()
+        public void SetNextTurnPlayer()
+        {
+            //prenod un numero random di una serie di numeri random
             Random rnd = new Random();
             rnd.Next();
             List<int> random = new List<int>();
@@ -71,11 +84,11 @@ namespace Connect4.Models
             }//se è pari allora il primo giocatore è Player 1, sennò Player 2
             if ((rnd.Next() % 2) == 0)
             {
-                return NextTurnPlayer.Player1;
+                NextTurnPlayer = NextTurnPlayer.Player1;
             }
             else
             {
-                return NextTurnPlayer.Player2;
+                NextTurnPlayer = NextTurnPlayer.Player2;
             }
         }
 
@@ -209,6 +222,7 @@ namespace Connect4.Models
             //return match.State.Equals("Conclusa");
         }
 
+       
         public int MakeMove(Match match, int column, ManageViewModels db)
         {   //ritorno un intero così posso gestire gli alert nel controller -- -1 non tuo turno, 0 colonna piena, 1 pareggio, 2 vittoria, 3 non è successo niente
             int valueToReturn = 3;
@@ -296,7 +310,8 @@ namespace Connect4.Models
         }
 
         public string DrawTable(Match match)
-        {//gestisco i colori delle celle della tabella e la disegno
+        {
+            //gestisco i colori delle celle della tabella e la disegno
             string table = "<table>";
             for (int i = 5; i >= 0; i--)
             {
@@ -328,26 +343,5 @@ namespace Connect4.Models
             return table;
         }
     
-        public int GetComputerMove(Match match, ManageViewModels db)
-        {
-            int[] values = new int[7];
-            for (int i = 0; i < 6; i++)
-            {//controllo sequenza orizzontale
-                values[i] = CheckVictory(match, 0, 4, 0, i, -1, db);
-            }
-            for (int i = 0; i < 6; i++)
-            {//controllo sequenza orizzontale
-                values[i] = CheckVictory(match, 0, 4, 0, i, -1, db);
-            }
-            for (int i = 0; i < 6; i++)
-            {//controllo sequenza orizzontale
-                values[i] = CheckVictory(match, 0, 4, 0, i, -1, db);
-            }
-            for (int i = 0; i < 6; i++)
-            {//controllo sequenza orizzontale
-                values[i] = CheckVictory(match, 0, 4, 0, i, -1, db);
-            }
-            return rnd.Next(0, 7);
-        }
     }
 }

@@ -2,31 +2,33 @@
 
 <table  class="table">
     <tr>
+        
         <th>
-            @Html.DisplayNameFor(model => model.Name)
+            Data
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Data)
+            Nome
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.NextTurnPlayer)
+            Prossimo giocatore
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.State)
+            Stato della partita
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Winner)
+            Vincitore
         </th>
         <th></th>
-    </tr>
+    </tr>       
     @foreach (var match in Model) {
         if(match.CanPartecipate(match) ||  match.IsPartecipating(match) || match.CanPlay(match)){
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => match.Name)
-                </td>
+                
                 <td>
                     @Html.DisplayFor(modelItem => match.Data)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => match.Name)
                 </td>
                 <td>
                     @if(!match.IsFinished(match)){
@@ -54,6 +56,7 @@
                 }<!--se non ci sono entrambi giocatori e il giocatore loggato fa parte del match mostro gioca-->
                 @if(match.CanPlay(match)){
                     <td>
+                        <input type="submit" value="Log in" class="btn btn-default" />
                         @Html.ActionLink("Play!", "Game", "Manage", match, null)
                     </td>
                 }

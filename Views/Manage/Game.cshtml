@@ -1,5 +1,4 @@
-﻿@model IEnumerable<Connect4.Models.Match>
-
+﻿
 <!--<meta http-equiv="refresh" content="2">-->
 
 @{
@@ -40,6 +39,13 @@ button{
 </style>
 <!-- Team 1->ROSSI:"#f44336" Team 2->BLU"#008CBA"-->
 <h2>Game</h2>
+<!--@using (Html.BeginForm()) 
+{
+    <div>
+        @Html.Raw(ViewBag.table)
+    </div>
+    
+}-->
 <div id="tableModel"></div>
 
 @section scripts{
@@ -48,29 +54,54 @@ button{
     <script type="text/javascript">
 
         $(function () {
-            var table = $.connection.ShowTableHub; 
+            var table = $.connection.ShowMatchHub; 
             
             table.client.GetUpdateTable = function () { 
-                getAll();
-                console.log("Calll");
+                var nameMatch = getUrlParameter("Name");
+                getAll(nameMatch);
+                console.log("chiamato");
             };
 
             $.connection.hub.start().done(function () {
-                getAll();
-                table.server.UpdateTable();
+                
+                var nameMatch = getUrlParameter("Name");
+
+                getAll(nameMatch);
+                table.server.UpdateTable(nameMatch);
             });
         });
 
-        function getAll() {
+        //funzione per prendere il nome della partita
+        function getUrlParameter(sParam) {
+                    var sPageURL = window.location.search.substring(1),
+                        sURLVariables = sPageURL.split('&'),
+                        sParameterName,
+                        i;
+
+                    for (i = 0; i < sURLVariables.length; i++) {
+                        sParameterName = sURLVariables[i].split('=');
+
+                        var key = decodeURIComponent(sParameterName[0]);
+                        var value = decodeURIComponent(sParameterName[1]);
+
+                        if (key === sParam) {
+                            return value === undefined ? true : value;
+                        }
+                    }
+        };
+
+        function getAll(nameMatch) {
             var model = $('#tableModel');
+            console.log(model);
+            var urlString = '/Manage/GetUpdateTable' + "?Name=" + nameMatch;
+            console.log("c'è");
             $.ajax({
-                
-                url: '/Manage/GetUpdateTable',  
+                url: urlString,  
                 contentType: 'application/html ; charset:utf-8',
                 type: 'GET',
                 dataType: 'html',
-                success: function(result){ model.empty().append(result);console.log(result);}  
-            });                       
+                success: function(result){model.empty().append(result);}  
+            });
         }
     </script>
 }

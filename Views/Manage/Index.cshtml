@@ -17,7 +17,6 @@
             
             hubNotify.client.GetUpdateData = function () { 
                 getAll();
-                console.log("Calll");
             };
 
             $.connection.hub.start().done(function () {
@@ -33,7 +32,7 @@
                 contentType: 'application/html ; charset:utf-8',
                 type: 'GET',
                 dataType: 'html',
-                success: function(result){ model.empty().append(result);}  
+                success: function(result){model.empty().append(result);}  
             });                       
         }
     </script>

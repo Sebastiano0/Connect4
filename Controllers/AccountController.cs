@@ -109,11 +109,6 @@ namespace Connect4.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-            if(model.Username.ToUpper() == "COMPUTER")
-            {
-                ModelState.AddModelError("", "This name is forbidden");
-                return View(model);
-            }
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Username, Address = model.Address, ZipCode = model.ZipCode, Town = model.Town, District = model.District, Nickname = model.Nickname };

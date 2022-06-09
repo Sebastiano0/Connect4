@@ -259,7 +259,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Hubs\ShowMatchHub.cs" />
-    <Compile Include="Hubs\ShowTableHub.cs" />
     <Compile Include="Migrations\202206061450537_VersusComputer.cs" />
     <Compile Include="Migrations\202206061450537_VersusComputer.designer.cs">
       <DependentUpon>202206061450537_VersusComputer.cs</DependentUpon>

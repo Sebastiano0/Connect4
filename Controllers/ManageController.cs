@@ -15,23 +15,30 @@ using Microsoft.AspNet.SignalR;
 
 namespace Connect4.Controllers
 {
+    class X :Object
+    { }
+
     public class ManageController : Controller
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
         private ManageViewModels db = new ManageViewModels();
         private Random rnd = new Random();
+
+
         public ApplicationSignInManager SignInManager
         {
             get
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
+
             private set 
             { 
                 _signInManager = value; 
             }
         }
+
 
         public ApplicationUserManager UserManager
         {
@@ -44,23 +51,28 @@ namespace Connect4.Controllers
                 _userManager = value;
             }
         }
+
+
         // GET: /Manage/Index
         public ActionResult Index()
         {
-            if(User.Identity.GetUserName() != null)
+            if (User.Identity.GetUserName() != null)
             {
                 return View(db.Matches.ToList());
-            } else
+            } 
+            else
             {
                 return RedirectToAction("Login", "Account");
             }
             
         }
 
+
         public ActionResult Create()
         {
             return View();
         }
+
 
         [HttpPost]
         public ActionResult Create(Match match)
@@ -68,9 +80,12 @@ namespace Connect4.Controllers
             match.State = State.InPartenza;
             //match.State = "In partenza";
             match.Data = DateTime.UtcNow.ToString("dd-MM-yyyy");
-            match.NextTurnPlayer = match.SetNextTurnPlayer();
+            //match.NextTurnPlayer = match.SetNextTurnPlayer();
+            match.SetNextTurnPlayer();
+
             //match.NextTurnPlayer = "Player 1";
             match.UsernamePlayer1 = User.Identity.GetUserName();
+
             if (match.VersusComputer)
             {
 
@@ -78,15 +93,19 @@ namespace Connect4.Controllers
                 match.State = State.InCorso;
                 match.NextTurnPlayer = NextTurnPlayer.Player1;
             }
+
+            //controllo che sia stato inserito il nome e che non esista già
             if (!ModelState.IsValid || db.Matches.Find(match.Name) != null || string.IsNullOrWhiteSpace(match.Name))
-            {//controllo che sia stato inserito il nome e che non esista già
-                ModelState.AddModelError("", "This name is already associated to another game");
+            {
+                ModelState.AddModelError(string.Empty, "This name is already associated to another game");
                 return View(match);
             }
+
             for (int i = 0; i < 7; i++)
             {
                 match.Columns.Add(new Column(match.Name));
             }
+
             db.Matches.Add(match);
             db.SaveChanges();
             ShowMatchHub.BroadcastMatch();
@@ -142,8 +161,7 @@ namespace Connect4.Controllers
                 return RedirectToAction("Index");//controllo se ha vinto o se è finita in parità
             }*/
             
-
-            ShowMatchHub.BroadcastMatch();
+            ShowMatchHub.UpdateTable();
             return View();
         }
 
@@ -168,6 +186,7 @@ namespace Connect4.Controllers
                 case -1:
                     TempData["AlertMessage"] = "Wait your turn please";
                     break;
+                default: throw new Exception("Mi sono dimenticato di un valore Cavolo!!!!!");
             }
             if (match.VersusComputer && (valueOfMove != 1 || valueOfMove != 2))
             {
@@ -178,6 +197,7 @@ namespace Connect4.Controllers
                 }
                 
             }
+            //ShowMatchHub.UpdateTable();
             //match = match.GetMatch(match, db);
             return RedirectToAction("Game", match);
         }
@@ -190,19 +210,19 @@ namespace Connect4.Controllers
         public ActionResult GetUpdateData()
         {
             return PartialView("_IndexPartial", db.Matches.ToList());
-            //return PartialView("Index", db.Matches.ToList());
         }
 
-        public ActionResult GetUpdateTable(Match match)
+        public ActionResult GetUpdateTable(string Name)
         {
-            //TempData["AlertMessage"] = Request.Url.AbsoluteUri;
-            /*string url = Request.Url.ToString().Split('?')[1].Split('&')[1];
+            //prendo il nome del match
+            //string matchName = Request.Url.AbsoluteUri.Split('?')[1].Split('=')[1];
+            //string url = Request.Url.ToString().Split('?')[1].Split('&')[1];
 
-            match = (Match)db.Matches.Where(c => c.Name.Equals(url));
+            Match match = db.Matches.FirstOrDefault(c => c.Name.Equals(Name));
             //creo la tabella con dati salvati
-            match = match.GetMatch(match, db); */
+            match = match.GetMatch(match, db);
             ViewBag.table = match.DrawTable(match);
-            return PartialView("_GamePartial", db.Matches.ToList());
+            return PartialView("_GamePartial", match);
             //return PartialView("_GamePartial");
         }
     }

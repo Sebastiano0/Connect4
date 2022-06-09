@@ -21,5 +21,15 @@ namespace Connect4
                 context.Clients.All.GetUpdateData();
             }
         }
+
+        [HubMethodName("UpdateTable")]
+        public static void UpdateTable()
+        {
+            var context = GlobalHost.ConnectionManager.GetHubContext<ShowMatchHub>();
+            if (context.Clients != null)
+            {
+                context.Clients.All.GetUpdateTable();
+            }
+        }
     }
 }
