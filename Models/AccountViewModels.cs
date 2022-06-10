@@ -40,12 +40,12 @@ namespace Connect4.Models
         public bool RememberMe { get; set; }
     }*/
 
-    /*public class ForgotViewModel
+    public class ForgotViewModel
     {
         [Required]
         [Display(Name = "Email")]
         public string Email { get; set; }
-    }*/
+    }
 
     public class LoginViewModel
     {
@@ -64,10 +64,15 @@ namespace Connect4.Models
 
     public class RegisterViewModel
     {
+        [Key]
         [Required]
         [Display(Name = "Username")]
-        [RegularExpression("Computer", ErrorMessage = "This name is forbidden")]
         public string Username { get; set; }
+
+        [Required]
+        [EmailAddress]
+        [Display(Name = "Email")]
+        public string Email { get; set;}
 
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
@@ -79,22 +84,27 @@ namespace Connect4.Models
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
         [Required]
         public string Address { get; set; }
+
         [Required]
         [StringLength(5, ErrorMessage = "Zip Code must contain 5 numbers")]
         [RegularExpression("^[0-9]*$", ErrorMessage = "Zip Code must contain 5 numbers")]
         public string ZipCode { get; set; }
+
         [Required]
         public string Town { get; set; }
+
         [Required]
         [StringLength(2, ErrorMessage = "District must contain 2 letters (for example: VE)")]
         public string District { get; set; }//provincia
+
         [Required]
         public string Nickname { get; set; }
     }
 
-    /*public class ResetPasswordViewModel
+    public class ResetPasswordViewModel
     {
         [Required]
         [EmailAddress]
@@ -121,5 +131,5 @@ namespace Connect4.Models
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
-    }*/
+    }
 }

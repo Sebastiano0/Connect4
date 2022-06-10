@@ -43,26 +43,37 @@ namespace Connect4.Models
 
         public int CanWin { get; set; }//se uguale a 7 qualcuno può vincere
 
+
         public Match()
         {
             Moves = new List<Move>();
             Columns = new List<Column>();
         }
 
+
+        public bool IsPlayer1(Match match)
+        {
+            return HttpContext.Current.User.Identity.Name == match.UsernamePlayer1;
+        }
+
+
         public bool CanPartecipate(Match match)
         {
             return match.UsernamePlayer2 == null && match.UsernamePlayer1 != HttpContext.Current.User.Identity.Name;
         }
+
 
         public bool IsPartecipating(Match match)
         {
             return match.UsernamePlayer1 == HttpContext.Current.User.Identity.Name || match.UsernamePlayer2 == HttpContext.Current.User.Identity.Name;
         }
 
+
         public bool CurrentPlayer(Match match)
         {//se il prossimo turno è del giocatore
             return ((match.UsernamePlayer1 == HttpContext.Current.User.Identity.Name) && match.NextTurnPlayer == NextTurnPlayer.Giocatore1) || ((match.UsernamePlayer2 == HttpContext.Current.User.Identity.Name) && match.NextTurnPlayer == NextTurnPlayer.Giocatore2);
         }
+
 
         public bool CanPlay(Match match)
         {
@@ -71,7 +82,7 @@ namespace Connect4.Models
 
         }
 
-        //public NextTurnPlayer SetNextTurnPlayer()
+
         public void SetNextTurnPlayer()
         {
             //prenod un numero random di una serie di numeri random
@@ -92,6 +103,7 @@ namespace Connect4.Models
             }
         }
 
+
         public Match GetMatch(Match match, ManageViewModels db)
         {
             match.Columns = db.Columns
@@ -108,13 +120,22 @@ namespace Connect4.Models
                 match.Columns[i].Cells = db.Cells.Where(c => c.Column_Id == column).ToList();
             }
 
-            return db.Matches.Single(m => m.Name == match.Name);
+            try
+            {
+                return db.Matches.Single(m => m.Name == match.Name);
+            } catch (Exception ex)
+            {
+                return null;
+            }
+            
         }
+
 
         private bool CheckVictory(int value, int player)
         {
             return value == player;
         }
+
 
         public int CheckVictory(Match match, int player, ManageViewModels db)
         {//ritorna 1 se ha vinto gioc1, 2 gioc2, 0 se nessuno
@@ -158,6 +179,7 @@ namespace Connect4.Models
 
             return value;
         }
+
 
         public int CheckVictory(Match match, int direction, int remainingPoint, int column, int cell, int player, ManageViewModels db)
         {//ritorna 1 se ha vinto gioc1, 2 gioc2, 0 se nessuno
@@ -215,6 +237,7 @@ namespace Connect4.Models
             }
             return 0;
         }
+        
 
         public bool IsFinished(Match match)
         {//controlla se la partita è finita
@@ -242,8 +265,20 @@ namespace Connect4.Models
                 int player = 1 + (int)match.NextTurnPlayer;
                 //Aggiungo la mossa alla lista
                 DateTime date = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time"));
-                match.Moves.Add(new Move(column, match.NextTurnPlayer, date.ToString("dd/MM/yyyy HH:mm:ss"), match.Name));
+
+                //aggiungo la mossa
+                if((match.UsernamePlayer2 == "Computer") && (match.NextTurnPlayer == NextTurnPlayer.Giocatore2))
+                {
+                    match.Moves.Add(new Move(column, match.NextTurnPlayer, "Computer", date.ToString("dd/MM/yyyy HH:mm:ss"), match.Name));
+                } 
+                else
+                {
+                    match.Moves.Add(new Move(column, match.NextTurnPlayer, HttpContext.Current.User.Identity.Name, date.ToString("dd/MM/yyyy HH:mm:ss"), match.Name));
+                }
+
+                
                 //cambio il prossimo giocatore e inserisco nella cella chi l'ha messa in campo
+
                 if (match.NextTurnPlayer == NextTurnPlayer.Giocatore1)
                 {
                     match.Columns[column].Cells.Add(cell);
@@ -256,12 +291,15 @@ namespace Connect4.Models
                     match.Columns[column].Cells[match.Columns[column].Cells.Count-1].Player = 2;
                     match.NextTurnPlayer = NextTurnPlayer.Giocatore1;
                 }
+
                 match.CanWin++;
                 db.SaveChanges();
+
                 //per controllare la vittoria (solo quando sono state inserite almeno 7 mosse)
                 if (match.CanWin >= 7)
                 {
                     int vittoria = match.CheckVictory(match, player, db);
+
                     if (vittoria == player)
                     {//qualcuno ha vinto
                         if (match.VersusComputer && match.NextTurnPlayer == NextTurnPlayer.Giocatore1)
@@ -284,6 +322,7 @@ namespace Connect4.Models
                         match.State = State.Conclusa;
                         valueToReturn = 1;
                     }
+
                     db.SaveChanges();
                 }
             }
@@ -294,6 +333,7 @@ namespace Connect4.Models
             }
             return valueToReturn;
         }
+
 
         //controllo se la cella è occupata dal giocatore corrente
         public bool PlayerHasOccupied(Match match, int j, int i, int player)
@@ -309,6 +349,7 @@ namespace Connect4.Models
             }
         }
 
+
         public string GetNextPlayer(Match match)
         {
             if(match.NextTurnPlayer == NextTurnPlayer.Giocatore1)
@@ -320,18 +361,31 @@ namespace Connect4.Models
             }
         }
 
+
         public string DrawTable(Match match)
         {
             string table = "";
             if (match.Winner == null)
             {
                 table += "<h4>Prossimo giocatore:" + GetNextPlayer(match) + "</h4>";
+            } 
+            else if (match.Winner != "Pareggio" && match.Winner != "Partita interrotta")
+            {
+                table += "<h4>Partita conclusa, il vincitore è: " + match.Winner + "</h4>";
+            }
+            else if (match.Winner == "Partita interrotta")
+            {
+                table += "<h4>La partita è stata interrotta e non è conclusa</h4>";
+            }
+            else
+            {
+                table += "<h4>Partita conclusa in parità</h4>";
             }
             table += "<table>";
             for (int i = 5; i >= 0; i--)
             {
                 table += "<tr>";
-                for (int j = 6; j >= 0; j--)
+                for (int j = 0; j < 7; j++)
                 {
                     if (match.PlayerHasOccupied(match, j, i, 1))
                     {
@@ -355,16 +409,16 @@ namespace Connect4.Models
                 table += "<td class = \"button\"><input type=\"submit\" name=\"column\" value=\" " + i + "\" class=\"btn btn-default\" style=\"display: block; margin: auto;\"" + DisableButton(match) + " /></td>";
             }
             table += "</tr></table ><h3> Mosse </h3><ul>";
-            //table += "<tr class= \"button\"><td class = \"button\"><input type=\"submit\" name=\"column\" value=\"0\" class=\"btn btn-default\" /></td><td class = \"button\"><input type=\"submit\" name=\"column\" value=\"1\" class=\"btn btn-default\" /></td><td class = \"button\"><input type=\"submit\" name=\"column\" value=\"2\" class=\"btn btn-default\" /></td><td class = \"button\"><input type=\"submit\" name=\"column\" value=\"3\" class=\"btn btn-default\" /></td><td class = \"button\"><input type=\"submit\" name=\"column\" value=\"4\" class=\"btn btn-default\" /></td><td class = \"button\"><input type=\"submit\" name=\"column\" value=\"5\" class=\"btn btn-default\" /></td><td class = \"button\"><input type=\"submit\" name=\"column\" value=\"6\" class=\"btn btn-default\" /></td></tr></table><h3>Mosse</h3><ul>";
             //aggiungo anche le mosse efettuate
-            for(int i = 0; i < match.Moves.Count; i++)
+            for(int i = match.Moves.Count-1; i >= 0; i--)
             {
-                table += "<li class=" + match.Moves[i].Player + ">" + match.Moves[i].Player +", at column " + (1+match.Moves[i].Column) + " at " + match.Moves[i].TimeStamp + "</li>";
+                table += "<li class=" + match.Moves[i].NextTurnPlayer + ">" + match.Moves[i].Player +", nella " + (1+match.Moves[i].Column) + "° colonna. Ora della mossa: " + match.Moves[i].TimeStamp + "</li>";
             }
             table += "</ul>";
             return table;
         }
         
+
         private string DisableButton(Match match)
         {
             if(match.Winner != null)

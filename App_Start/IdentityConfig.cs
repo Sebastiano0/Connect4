@@ -16,6 +16,7 @@ namespace Connect4
 {
     public class EmailService : IIdentityMessageService
     {
+
         public Task SendAsync(IdentityMessage message)
         {
             // Plug in your email service here to send an email.
@@ -47,7 +48,7 @@ namespace Connect4
             manager.UserValidator = new UserValidator<ApplicationUser>(manager)
             {
                 AllowOnlyAlphanumericUserNames = false,
-                RequireUniqueEmail = false
+                RequireUniqueEmail = true
             };
 
             // Configure validation logic for passwords

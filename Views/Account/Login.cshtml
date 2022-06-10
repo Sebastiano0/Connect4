@@ -13,7 +13,9 @@
                 @Html.AntiForgeryToken()
                 <h4>Usa un account esistente per accedere</h4>
                 <hr />
+
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
                 <div class="form-group">
                     @Html.LabelFor(m => m.Username, new { @class = "col-md-2 control-label" })
                     <div class="col-md-10">
@@ -21,6 +23,7 @@
                         @Html.ValidationMessageFor(m => m.Username, "Nome non esistente", new { @class = "text-danger" })
                     </div>
                 </div>
+
                 <div class="form-group">
                     @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
                     <div class="col-md-10">
@@ -28,6 +31,7 @@
                         @Html.ValidationMessageFor(m => m.Password, "Password sbagliata", new { @class = "text-danger" })
                     </div>
                 </div>
+
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
                         <div class="checkbox">
@@ -36,9 +40,11 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-5">
-                        <input type="submit" value="Log in" class="btn btn-default" />
+                        <input type="hidden" value="Log in">
+                        <input type="submit" value="Accedi" class="btn btn-default" />
                     </div>
                     <div class="col-md-offset-2 col-md-5">
                         @Html.ActionLink("Registrati come nuovo utente", "Register", new { @class= "btn btn-default" })

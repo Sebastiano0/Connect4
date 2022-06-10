@@ -20,6 +20,7 @@ namespace Connect4.Controllers
 
     public class ManageController : Controller
     {
+
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
         private ManageViewModels db = new ManageViewModels();
@@ -54,12 +55,40 @@ namespace Connect4.Controllers
 
 
         // GET: /Manage/Index
-        public ActionResult Index()
+        public ActionResult Index(Match match/*, string id = ""*/)
         {
-            if (User.Identity.GetUserName() != null)
+            //Uri uri = new Uri(System.Web.HttpContext.Current.Request.Url.AbsoluteUri);
+            //id = HttpUtility.ParseQueryString(uri.Query).Get("id");
+                
+            //if (id != null)
+            //{
+            //    string searchString = id;
+            //    var matches = from m in db.Matches
+            //                  select m;
+
+            //    if (!String.IsNullOrEmpty(searchString))
+            //    {
+            //        matches = db.Matches.Where(s => s.Name.Contains(searchString));
+            //    }
+            //    return View(matches.ToList());
+            //}
+            
+            match = match.GetMatch(match, db);
+
+            if (User.Identity.GetUserName() != null && match == null)
             {
                 return View(db.Matches.ToList());
             } 
+            
+            if(match != null)
+            {
+                match.Winner = "Partita interrotta";
+                match.State = State.Conclusa;
+                db.Entry(match).State = EntityState.Modified;
+                db.SaveChanges();
+                return View(db.Matches.ToList());
+            }
+            
             else
             {
                 return RedirectToAction("Login", "Account");
@@ -78,14 +107,11 @@ namespace Connect4.Controllers
         public ActionResult Create(Match match)
         {
             match.State = State.InPartenza;
-            //match.State = "In partenza";
             match.Data = DateTime.UtcNow.ToString("dd-MM-yyyy");
-            //match.NextTurnPlayer = match.SetNextTurnPlayer();
             match.SetNextTurnPlayer();
-
-            //match.NextTurnPlayer = "Player 1";
             match.UsernamePlayer1 = User.Identity.GetUserName();
 
+            //controllo se la partita è contro il computer
             if (match.VersusComputer)
             {
 
@@ -101,6 +127,7 @@ namespace Connect4.Controllers
                 return View(match);
             }
 
+            //aggiungo le colonne alla partita
             for (int i = 0; i < 7; i++)
             {
                 match.Columns.Add(new Column(match.Name));
@@ -108,116 +135,133 @@ namespace Connect4.Controllers
 
             db.Matches.Add(match);
             db.SaveChanges();
+
             ShowMatchHub.BroadcastMatch();
+
             return RedirectToAction("Index");
         }
 
+
         public ActionResult Partecipate(Match match)
         {
-            //if (string.IsNullOrWhiteSpace(Name))
-            //{
-            //    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            //}
-            //Match match = db.Matches.Find(Name);
+            //controllo che match esista e che non stia partecipando di nuovo il giocatore1
             if (match == null || User.Identity.GetUserName() == match.UsernamePlayer1)
             {
-                return HttpNotFound();
+                TempData["AlertMessage"] = "Partita non trovata";
+                return RedirectToAction("Index");
             }
-            match.State = State.InCorso;//cambio lo stato della partita
-            //match.State = "In corso";
+
+            //imposto le variabili della partita
+            match.State = State.InCorso;
             match.UsernamePlayer2 = User.Identity.GetUserName();
-            db.Entry(match).State = EntityState.Modified;//se non si lascia non si salvano i valori modificati
+            
+            db.Entry(match).State = EntityState.Modified;
             db.SaveChanges();
+
             ShowMatchHub.BroadcastMatch();
-            //System.Windows.Forms.MessageBox.Show("Successful enrolled to match");
-            TempData["AlertMessage"] = "Partecipazione alla partita effettuata";
+            
+            TempData["AlertMessage"] = "Partecipazione alla partita avvenuta con successo";
             return RedirectToAction("Index");
         }
+
 
         public ActionResult Game(Match match)
         {   
             string user = User.Identity.GetUserName();
             bool player1Logged = user == match.UsernamePlayer1;
             bool player2Logged = user == match.UsernamePlayer2;
+
+            //controllo se il match esiste o il giocatore ne fa parte
             if (match == null || (!player1Logged && !player2Logged))
             {
-                return HttpNotFound();
+                TempData["AlertMessage"] = "Partita non trovata, controlla se è presente nella tua lista";
+                return RedirectToAction("Index");
             }
+
             match = match.GetMatch(match, db);
             ViewBag.table = match.DrawTable(match);
+
             //controllo se il giocatore loggato ha perso
-            if ((player2Logged && match.Winner == match.UsernamePlayer1) || (player1Logged && match.Winner == match.UsernamePlayer2))
+            if ((match.Winner != null) && ((player2Logged && match.Winner == match.UsernamePlayer1) || (player1Logged && match.Winner == match.UsernamePlayer2)))
             {
                 TempData["AlertMessage"] = "Hai perso";                
             } 
-            /*else if((player2Logged && match.Winner == match.UsernamePlayer2) || (player1Logged && match.Winner == match.UsernamePlayer1) || (match.Winner == "Drawn"))
-            {
-                return RedirectToAction("Index");//controllo se ha vinto o se è finita in parità
-            }*/
             
             ShowMatchHub.UpdateTable();
             return View();
         }
+
 
         [HttpPost]
         public ActionResult Game(Match match, string column)
         {
             match = match.GetMatch(match, db);
             int valueOfMove = match.MakeMove(match, int.Parse(column), db);
+
+            //controllo le conseguenza della mossa
             switch (valueOfMove)
-            {//controllo le conseguenza della mossa
-                case 0:
-                    TempData["AlertMessage"] = "La colonna è piena";
-                    break;
-                case 1:
-                    TempData["AlertMessage"] = "Nessuno ha vinto, è un pareggio!";
-                    break;
-                case 2:
-                    TempData["AlertMessage"] = "Hai vinto la partita!";
-                    break;
+            {
                 case 3:
                     break;
+
                 case -1:
                     TempData["AlertMessage"] = "Aspetta il tuo turno!";
                     break;
+
+                case 2:
+                    TempData["AlertMessage"] = "Hai vinto la partita!";
+                    break;
+
+                case 0:
+                    TempData["AlertMessage"] = "La colonna è piena";
+                    break;
+                
+                case 1:
+                    TempData["AlertMessage"] = "Nessuno ha vinto, è un pareggio!";
+                    break;
+                
                 default: throw new Exception("Some exception");
             }
+
+            //se la partita è contro il computer e la mossa dell'utente 
+            //non ha portato a vittoria o pareggio tocca al computer
             if (match.VersusComputer && (valueOfMove != 1 || valueOfMove != 2))
             {
                 valueOfMove = ComputerMove(match);
+
+                //faccio la mossa finchè non vado su una colonna vuota
                 while (valueOfMove == 0)
-                {//faccio la mossa finchè non vado su una colonna vuota
+                {
                     valueOfMove = ComputerMove(match);
                 }
                 
             }
-            //ShowMatchHub.UpdateTable();
-            //match = match.GetMatch(match, db);
+
             return RedirectToAction("Game", match);
         }
+
 
         public int ComputerMove(Match match)
         {            
             return match.MakeMove(match, rnd.Next(0, 7), db);            
         }
 
+
         public ActionResult GetUpdateData()
         {
             return PartialView("_IndexPartial", db.Matches.ToList());
         }
 
+
         public ActionResult GetUpdateTable(string Name)
         {
-            //prendo il nome del match
-            //string matchName = Request.Url.AbsoluteUri.Split('?')[1].Split('=')[1];
-            //string url = Request.Url.ToString().Split('?')[1].Split('&')[1];
-
+            //prendo dal database il match
             Match match = db.Matches.FirstOrDefault(c => c.Name.Equals(Name));
-            //creo la tabella con dati salvati
             match = match.GetMatch(match, db);
+
+            //creo la tabella con dati salvati
             ViewBag.table = match.DrawTable(match);
             return PartialView("_GamePartial", match);
-            //return PartialView("_GamePartial");
         }
     }
 }

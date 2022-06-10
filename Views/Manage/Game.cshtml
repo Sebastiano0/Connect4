@@ -1,7 +1,4 @@
-﻿
-<!--<meta http-equiv="refresh" content="2">-->
-
-@{
+﻿@{
     ViewBag.Title = "Partita";
 }
 
@@ -24,6 +21,10 @@ td{
 button{
     width: 80%;
     height: 60%;
+}
+
+.btn-default{
+    width: 80%
 }
 
 .button{
@@ -50,16 +51,13 @@ ul{
     content: "•"; color: #008CBA
 }
 </style>
-<!-- Team 1->ROSSI:"#f44336" Team 2->BLU"#008CBA"-->
-<h2>Game</h2>
+
+<h2>Partita</h2>
+
 @using (Html.BeginForm()) 
 {
-    <div>
-        @Html.Raw(ViewBag.table)
-    </div>
-    
+    <div id="tableModel"></div>
 }
-<!--<div id="tableModel"></div>
 
 @section scripts{
     <script src="~/Scripts/jquery.signalR-2.4.3.min.js"></script>
@@ -72,13 +70,10 @@ ul{
             table.client.GetUpdateTable = function () { 
                 var nameMatch = getUrlParameter("Name");
                 getAll(nameMatch);
-                console.log("chiamato");
             };
 
             $.connection.hub.start().done(function () {
-                
                 var nameMatch = getUrlParameter("Name");
-
                 getAll(nameMatch);
                 table.server.UpdateTable(nameMatch);
             });
@@ -86,12 +81,14 @@ ul{
 
         //funzione per prendere il nome della partita
         function getUrlParameter(sParam) {
+
                     var sPageURL = window.location.search.substring(1),
                         sURLVariables = sPageURL.split('&'),
                         sParameterName,
                         i;
 
                     for (i = 0; i < sURLVariables.length; i++) {
+
                         sParameterName = sURLVariables[i].split('=');
 
                         var key = decodeURIComponent(sParameterName[0]);
@@ -104,10 +101,11 @@ ul{
         };
 
         function getAll(nameMatch) {
+
             var model = $('#tableModel');
             console.log(model);
             var urlString = '/Manage/GetUpdateTable' + "?Name=" + nameMatch;
-            console.log("c'è");
+
             $.ajax({
                 url: urlString,  
                 contentType: 'application/html ; charset:utf-8',
@@ -117,4 +115,4 @@ ul{
             });
         }
     </script>
-}-->
+}

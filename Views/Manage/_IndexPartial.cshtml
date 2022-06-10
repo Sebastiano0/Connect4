@@ -6,60 +6,73 @@
         <th>
             Data
         </th>
+
         <th>
             Nome
         </th>
+
         <th>
             Prossimo giocatore
         </th>
+
         <th>
             Stato della partita
         </th>
+
         <th>
             Vincitore
         </th>
+
         <th></th>
-    </tr>       
+    </tr>
     @foreach (var match in Model) {
+        <!--Creo la lista con tutti i match se l'utente sta partecipando, giocando o può partecipare-->
         if(match.CanPartecipate(match) ||  match.IsPartecipating(match) || match.CanPlay(match)){
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => match.Data)
                 </td>
+
                 <td>
                     @Html.DisplayFor(modelItem => match.Name)
                 </td>
+
                 <td>
                     @if(!match.IsFinished(match)){
                         if(match.CurrentPlayer(match)){
+                            
                             @Html.DisplayFor(modelItem => match.NextTurnPlayer)
-                            <text>(TE)</text>
+                            <text>(Tu)</text>
                         } else {
                             @Html.DisplayFor(modelItem => match.NextTurnPlayer)
                         }
                     }
                 </td>
+
                 <td>
                     @Html.DisplayFor(modelItem => match.State)
                 </td>
+
                 <td>
                     @if(match.IsFinished(match)){
                         @Html.DisplayFor(modelItem => match.Winner)
                     }
                 </td>
+
                 <!--se non c'è neancora il secondo giocatore e il giocatore non è quello che ha creato la partita mostro partecipa-->
                 @if(match.CanPartecipate(match)){
                     <td>
                         @Html.ActionLink("Parteicpa", "Partecipate", "Manage", match, new { @class = "btn btn-default partecipate" })
-                        <!--@Html.ActionLink("Partecipate", "Partecipate", "Manage", match, null)-->
                     </td>
                 } 
+
                 @if (match.CanPlay(match)){
                     <td>
                         @Html.ActionLink("Gioca", "Game", "Manage", match, new { @class = "btn btn-default play" })
-
+                        @Html.ActionLink("Interrompi partita", "Index", "Manage", match, new { @class = "btn btn-default" })
                     </td>
                 }
+
                 @if (!match.CanPlay(match) && match.IsPartecipating(match) && match.IsFinished(match)){
                     <td>
                         @Html.ActionLink("Vedi campo di gioco", "Game", "Manage", match, new { @class = "btn btn-default" })

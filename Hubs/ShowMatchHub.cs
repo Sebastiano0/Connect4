@@ -16,6 +16,7 @@ namespace Connect4
         public static void BroadcastMatch()
         {
             var context = GlobalHost.ConnectionManager.GetHubContext<ShowMatchHub>();
+
             if (context.Clients != null)
             {
                 context.Clients.All.GetUpdateData();
@@ -26,6 +27,7 @@ namespace Connect4
         public static void UpdateTable()
         {
             var context = GlobalHost.ConnectionManager.GetHubContext<ShowMatchHub>();
+
             if (context.Clients != null)
             {
                 context.Clients.All.GetUpdateTable();
